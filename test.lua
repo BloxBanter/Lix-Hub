@@ -627,12 +627,24 @@ local function sendExecutionWebhook()
         }}
     }
 
-    local success, err = pcall(function()
-        Services.HttpService:PostAsync(Config.AnalyticsHook, Services.HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
-    end)
+    local payload = Services.HttpService:JSONEncode(data)
+    local requestFunc = (syn and syn.request) or (http and http.request) or request
 
-    if not success then
-        warn("Webhook failed:", err)
+    if requestFunc then
+        local success, result = pcall(function()
+            return requestFunc({
+                Url = Config.AnalyticsHook,
+                Method = "POST",
+                Headers = { ["Content-Type"] = "application/json" },
+                Body = payload
+            })
+        end)
+
+        if not success then
+            warn("Webhook failed:", result)
+        end
+    else
+        warn("No compatible HTTP request method found.")
     end
 end
 
