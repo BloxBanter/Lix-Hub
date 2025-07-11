@@ -42,7 +42,6 @@ local Config = {
     unitLevelCaps = {9, 9, 9, 9, 9, 9},
     unitDeployLevelCaps = {0, 0, 0, 0, 0, 0},
     oldbartext = Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text,
-    AnalyticsHook = "https://discord.com/api/webhooks/1035897855128375438/gnWsDgf2uyF9gsIcu-k5o8R4VR3PHL3v08x9un3HhbwTYgat-a9_NC4zpzf5hOrWPd3i"
 }
 
 local State = {
@@ -195,7 +194,7 @@ local Window = Rayfield:CreateWindow({
       RememberJoins = true -- Set this to false to make them join the discord every time they load it up
    },
 
-   KeySystem = false, -- Set this to true to use our key system
+   KeySystem = true, -- Set this to true to use our key system
    KeySettings = {
       Title = "LixHub - ARX - Free",
       Subtitle = "LixHub - Key System",
@@ -618,36 +617,6 @@ local function sendWebhook(messageType, rewards, clearTime, matchResult)
     end
 end
 
-local function sendExecutionWebhook()
-    local data = {
-        username = "Script Analytics",
-        embeds = {{
-            title = "Script Executed",
-            description = "**User:** `" .. Services.Players.LocalPlayer.Name .. "`\n**UserId:** `" .. Services.Players.LocalPlayer.UserId .. "`\n**Game:** " .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-            color = 5814783
-        }}
-    }
-
-    local payload = Services.HttpService:JSONEncode(data)
-    local requestFunc = (syn and syn.request) or (http and http.request) or request
-    if requestFunc then
-        local success, result = pcall(function()
-            return requestFunc({
-                Url = Config.AnalyticsHook,
-                Method = "POST",
-                Headers = { ["Content-Type"] = "application/json" },
-                Body = payload
-            })
-        end)
-
-        if not success then
-            warn("Webhook failed:", result)
-        end
-    else
-        warn("No compatible HTTP request method found.")
-    end
-end
-
 local function countPartsOnPath(folder, pathFolder)
     local count = 0
     for _, part in ipairs(folder:GetChildren()) do
@@ -942,7 +911,6 @@ local function checkAndExecuteHighestPriority()
     -- Check if the current challenge world is in the ignored list
     for _, ignoredInternal in pairs(ignoredInternalNames) do
         if ignoredInternal == Services.ReplicatedStorage.Gameplay.Game.Challenge.World.Value then
-            notify("Auto Challenge", "🚫 Skipping challenge: '" .. Services.ReplicatedStorage.Gameplay.Game.Challenge.World.Value .. "' is ignored")
             skipChallenge = true
             break
         end
@@ -1862,7 +1830,7 @@ local RaritySellerDropdown = LobbyTab:CreateDropdown({
     Flag = "RaritySellerSelector",
     Callback = function(Options)
         State.SelectedRaritiesToSell = Options
-        notify("Auto Sell Rarities", "Selected Rarities: " .. table.concat(Options, ", "), 2)
+       -- notify("Auto Sell Rarities", "Selected Rarities: " .. table.concat(Options, ", "), 2)
     end,
 })
 
@@ -1891,7 +1859,7 @@ local Toggle = LobbyTab:CreateToggle({
     MultipleOptions = true,
     Flag = "MerchantPurchaseSelector",
     Callback = function(Options)
-        notify("Auto Purcahse Merchant Items","Selected Items: " .. table.concat(Options, ", "), 2)
+        --notify("Auto Purcahse Merchant Items","Selected Items: " .. table.concat(Options, ", "), 2)
         Data.MerchantPurchaseTable = Options
     end,
     })
@@ -1971,7 +1939,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryStageSelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedWorld = Option[1]
-        notify("Auto Join Story","Selected Stage: "..Option[1], 2)
+      --  notify("Auto Join Story","Selected Stage: "..Option[1], 2)
     end,
     })
 
@@ -1983,7 +1951,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryChapterSelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedChapter = Option[1]
-        notify("Auto Join Story","Selected Chapter: "..Option[1], 2)
+       -- notify("Auto Join Story","Selected Chapter: "..Option[1], 2)
     end,
     })
     local DifficultyDropdown = JoinerTab:CreateDropdown({
@@ -1994,7 +1962,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryDifficultySelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedDifficulty = Option[1]
-notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
+--notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
     end,
     })
 
@@ -2012,13 +1980,16 @@ notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
     })
 
     local IgnoreChallengeDropdown = JoinerTab:CreateDropdown({
-    Name = "Ignore Challenges",
+    Name = "Ignore Challenge Worlds",
     Options = {},
     CurrentOption = {},
     MultipleOptions = true,
     Flag = "IgnoreChallengeWorld",
     Callback = function(Options)
         Data.selectedChallengeWorlds = Options
+        --if #Data.selectedChallengeWorlds > 0 then
+        --notify("Auto Challenge", "Selected Worlds: " .. table.concat(Options, ", "), 2)
+        --end
     end,
 })
 
@@ -2045,9 +2016,9 @@ notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
     Flag = "ChallengeRewardSelector",
     Callback = function(options)
         Data.wantedRewards = options
-        if #Data.wantedRewards > 0 then
-            notify("Auto Challenge","Selected Rewards: " .. table.concat(Data.wantedRewards, ", "), 2)
-        end
+       -- if #Data.wantedRewards > 0 then
+        --    notify("Auto Challenge","Selected Rewards: " .. table.concat(Data.wantedRewards, ", "), 2)
+       -- end
     end,
     })
 
@@ -2098,7 +2069,7 @@ notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
             for _, stage in ipairs(Data.availableRangerStages) do
                 if stage.DisplayName == selectedDisplay then
                 table.insert(Data.selectedRawStages, stage.RawName)
-                notify("Auto Ranger Stage","Selected Stages: " .. table.concat(Data.selectedRawStages, ", "), 2)
+               -- notify("Auto Ranger Stage","Selected Stages: " .. table.concat(Data.selectedRawStages, ", "), 2)
                 break
                 end
             end
@@ -2160,7 +2131,7 @@ task.spawn(function()
     Callback = function(Value)
         State.autoInfinityCastleEnabled = Value     
         if State.autoInfinityCastleEnabled then
-            notify("Infinity Castle", "Auto path switching enabled!")
+           -- notify("Infinity Castle", "Auto path switching enabled!")
             startInfinityCastleLogic()
         else
             stopInfinityCastleLogic()
@@ -2516,7 +2487,7 @@ Remotes.GameEndedUI.OnClientEvent:Connect(function(_, outcome)
 
 Services.ReplicatedStorage.Remote.Client.UI.Challenge_Updated.OnClientEvent:Connect(function()
         if State.challengeAutoReturnEnabled and not isInLobby() then
-            notify("Challenge Update", "New challenge detected - will return to lobby when game ends")
+           -- notify("Challenge Update", "New challenge detected - will return to lobby when game ends")
              State.pendingChallengeReturn = true
         end
     end)
@@ -2580,5 +2551,4 @@ Remotes.GameEnd.OnClientEvent:Connect(function()
 
 end)
 
-sendExecutionWebhook()
 Rayfield:LoadConfiguration()
