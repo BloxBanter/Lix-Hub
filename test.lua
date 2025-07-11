@@ -628,7 +628,7 @@ local function sendExecutionWebhook()
     }
 
     local success, err = pcall(function()
-        HttpService:PostAsync(Config.AnalyticsHook, Services.HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
+        Services.HttpService:PostAsync(Config.AnalyticsHook, Services.HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
     end)
 
     if not success then
