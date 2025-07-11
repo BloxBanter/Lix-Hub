@@ -222,7 +222,7 @@ local function enableLowPerformanceMode()
         
         local playerGui = Services.Players.LocalPlayer:WaitForChild("PlayerGui")
         for _, gui in pairs(playerGui:GetDescendants()) do
-            if gui:IsA("UIGradient") or gui:IsA("UIStroke") or gui:IsA("DropShadowEffect") or gui:IsA("BlurEffect") then
+            if gui:IsA("UIGradient") or gui:IsA("UIStroke") or gui:IsA("DropShadowEffect") then
                 gui.Enabled = false
             end
         end
@@ -261,7 +261,7 @@ Remotes.SettingEvent:FireServer(unpack({"DisibleDamageText", true}))
         
         local playerGui = Services.Players.LocalPlayer:WaitForChild("PlayerGui")
         for _, gui in pairs(playerGui:GetDescendants()) do
-            if gui:IsA("UIGradient") or gui:IsA("UIStroke") or gui:IsA("DropShadowEffect") or gui:IsA("BlurEffect") then
+            if gui:IsA("UIGradient") or gui:IsA("UIStroke") or gui:IsA("DropShadowEffect") then
                 gui.Enabled = true
             end
         end
@@ -1462,7 +1462,7 @@ local function StreamerMode()
         billboard:FindFirstChild("PlayerName").Text = tostring(Services.Players.LocalPlayer.Name)
         billboard:FindFirstChild("Level").Text = "Level "..Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Level.Value
         billboard:FindFirstChild("Title").Text = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Title.Value
-        Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Level.Value
+        Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text = "Level "..Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Level.Value
     end
     end  
 end
