@@ -268,7 +268,7 @@ Remotes.SettingEvent:FireServer(unpack({"DisibleDamageText", true}))
         end
         
         for _, obj in pairs(Services.Lighting:GetChildren()) do
-            if obj:IsA("BloomEffect") or obj:IsA("BlurEffect") or obj:IsA("ColorCorrectionEffect") or
+            if obj:IsA("BloomEffect") or obj:IsA("ColorCorrectionEffect") or
             obj:IsA("SunRaysEffect") or obj:IsA("DepthOfFieldEffect") then
                 obj.Enabled = true
             end
@@ -1588,8 +1588,19 @@ end)
         end
     end)
 
-    Services.Players.LocalPlayer.CharacterAdded:Connect(updateOverheadText)
-    Services.Players.LocalPlayer.CharacterAdded:Connect(enableLowPerformanceMode)
+     task.spawn(function()
+        while true do
+            task.wait(0.5) -- Check every 0.5 seconds
+            enableLowPerformanceMode()
+        end
+    end)
+
+    task.spawn(function()
+        while true do
+            task.wait(0.5) -- Check every 0.5 seconds
+            StreamerMode()
+        end
+    end)
 
     task.spawn(function()
     while true do
@@ -1739,7 +1750,6 @@ local Button = LobbyTab:CreateButton({
     Flag = "LowFPSMode",
     Callback = function(Value)
         State.enableLowPerformanceMode = Value
-            enableLowPerformanceMode()
     end,
 })
 
@@ -1835,7 +1845,6 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "LowFPSMode",
     Callback = function(Value)
         State.streamerModeEnabled = Value
-        StreamerMode()
     end,
 })
 
