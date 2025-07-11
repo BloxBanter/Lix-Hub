@@ -1741,7 +1741,7 @@ local Button = LobbyTab:CreateButton({
     local Toggle = GameTab:CreateToggle({
     Name = "Low Performance Mode",
     CurrentValue = false,
-    Flag = "LowFPSMode",
+    Flag = "enableLowPerformanceMode",
     Callback = function(Value)
         State.enableLowPerformanceMode = Value
         enableLowPerformanceMode()
