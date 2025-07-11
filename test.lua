@@ -929,9 +929,9 @@ local function checkAndExecuteHighestPriority()
 
     -- Priority 1: Challenge Auto Join
     if State.autoChallengeEnabled then
-        if #State.selectedChallengeWorlds > 0 then
+        if #Data.selectedChallengeWorlds > 0 then
              local ignoredInternalNames = {}
-    for _, displayName in pairs(State.selectedChallengeWorlds) do
+    for _, displayName in pairs(Data.selectedChallengeWorlds) do
         local internalName = getInternalWorldName(displayName)
         if internalName then
             table.insert(ignoredInternalNames, internalName)
@@ -2014,7 +2014,7 @@ notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
     MultipleOptions = true,
     Flag = "IgnoreChallengeWorld",
     Callback = function(Options)
-        State.selectedChallengeWorlds = Options
+        Data.selectedChallengeWorlds = Options
     end,
 })
 
