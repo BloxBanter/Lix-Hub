@@ -1809,6 +1809,7 @@ local RaritySellerDropdown = LobbyTab:CreateDropdown({
     Flag = "RaritySellerSelector",
     Callback = function(Options)
         State.SelectedRaritiesToSell = Options
+        notify("Auto Sell Rarities","Selected Rarities: ",table.concat(Options, ", "))
     end,
 })
 
@@ -1837,7 +1838,7 @@ local Toggle = LobbyTab:CreateToggle({
     MultipleOptions = true,
     Flag = "MerchantPurchaseSelector",
     Callback = function(Options)
-        print("Selected items for auto purchase:", table.concat(Options, ", "))
+        notify("Auto Purcahse Merchant Items","Selected Items: ",table.concat(Options, ", "))
         Data.MerchantPurchaseTable = Options
     end,
     })
@@ -1916,7 +1917,8 @@ local Toggle = LobbyTab:CreateToggle({
     MultipleOptions = false,
     Flag = "StoryStageSelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
-        State.selectedWorld = Option[1]  
+        State.selectedWorld = Option[1]
+        notify("Auto Join Story","Selected Stage: "..Option)
     end,
     })
 
@@ -1928,7 +1930,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryChapterSelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedChapter = Option[1]
-
+        notify("Auto Join Story","Selected Chapter: "..Option)
     end,
     })
     local DifficultyDropdown = JoinerTab:CreateDropdown({
@@ -1939,7 +1941,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryDifficultySelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedDifficulty = Option[1]
-
+notify("Auto Join Story","Selected Difficulty: "..Option)
     end,
     })
 
@@ -1977,7 +1979,7 @@ local Toggle = LobbyTab:CreateToggle({
     Callback = function(options)
         Data.wantedRewards = options
         if #Data.wantedRewards > 0 then
-            print("🔎 Target rewards set to:", table.concat(Data.wantedRewards, ", "))
+            notify("Auto Challenge","Selected Rewards: ",table.concat(Data.wantedRewards, ", "))
         end
     end,
     })
@@ -2029,6 +2031,7 @@ local Toggle = LobbyTab:CreateToggle({
             for _, stage in ipairs(Data.availableRangerStages) do
                 if stage.DisplayName == selectedDisplay then
                 table.insert(Data.selectedRawStages, stage.RawName)
+                notify("Auto Ranger Stage","Selected Stages: ",table.concat(Data.selectedRawStages, ", "))
                 break
                 end
             end
