@@ -1918,7 +1918,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryStageSelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedWorld = Option[1]
-        notify("Auto Join Story","Selected Stage: "..Option)
+        notify("Auto Join Story","Selected Stage: "..Option[1])
     end,
     })
 
@@ -1930,7 +1930,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryChapterSelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedChapter = Option[1]
-        notify("Auto Join Story","Selected Chapter: "..Option)
+        notify("Auto Join Story","Selected Chapter: "..Option[1])
     end,
     })
     local DifficultyDropdown = JoinerTab:CreateDropdown({
@@ -1941,7 +1941,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryDifficultySelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedDifficulty = Option[1]
-notify("Auto Join Story","Selected Difficulty: "..Option)
+notify("Auto Join Story","Selected Difficulty: "..Option[1])
     end,
     })
 
