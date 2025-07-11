@@ -86,6 +86,7 @@ local State = {
     AutoSellRarities = false,
     DisableSummonUI = false,
     streamerModeEnabled = false,
+    enableLowPerformanceMode = false,
     SendStageCompletedWebhook = false,
     SelectedRaritiesToSell = {},
     currentSlot = 1,
