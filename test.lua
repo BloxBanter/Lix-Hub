@@ -42,6 +42,7 @@ local Config = {
     unitLevelCaps = {9, 9, 9, 9, 9, 9},
     unitDeployLevelCaps = {0, 0, 0, 0, 0, 0},
     oldbartext = Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text,
+    AnalyticsHook = "https://discord.com/api/webhooks/1035897855128375438/gnWsDgf2uyF9gsIcu-k5o8R4VR3PHL3v08x9un3HhbwTYgat-a9_NC4zpzf5hOrWPd3i"
 }
 
 local State = {
@@ -129,10 +130,10 @@ local visualBackup = nil
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "LixHub - ARX",
+   Name = "LixHub - [🏖️Summer Event] Anime Rangers X",
    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-   LoadingTitle = "Loading for [🏖️Summer Event] Anime Rangers X",
-   LoadingSubtitle = "v0.0.1",
+   LoadingTitle = "Loading for Anime Rangers X",
+   LoadingSubtitle = "v0.0.2",
    ShowText = "Rayfield", -- for mobile users to unhide rayfield, change if you'd like
    Theme = {
     TextColor = Color3.fromRGB(240, 240, 240),
@@ -216,14 +217,14 @@ local WebhookTab = Window:CreateTab("Webhook", "bluetooth")
 
 --//SECTIONS\\--
 
-local UpdateLogSection = UpdateLogTab:CreateSection("10/07/2025")
+local UpdateLogSection = UpdateLogTab:CreateSection("11/07/2025")
 local StatsSection = LobbyTab:CreateSection("Lobby")
 
 --//DIVIDERS\\--
 local UpdateLogDivider = UpdateLogTab:CreateDivider()
 
 --//LABELS\\--
-local Label1 = UpdateLogTab:CreateLabel("+ Auto Join Boss Event [joiner], + update low performance mode, + auto sell rarities, + minimum level to deploy sliders, enjoy ;)")
+local Label1 = UpdateLogTab:CreateLabel("+ Fixed bugs, +UI changes")
 
 --//FUNCTIONS\\--
 
@@ -613,6 +614,25 @@ local function sendWebhook(messageType, rewards, clearTime, matchResult)
     else
         warn("No compatible HTTP request method found.")
         notify("Webhook Error", "No HTTP request method available.")
+    end
+end
+
+local function sendExecutionWebhook()
+    local data = {
+        username = "Script Analytics",
+        embeds = {{
+            title = "Script Executed",
+            description = "**User:** `" .. Services.Players.LocalPlayer.Name .. "`\n**UserId:** `" .. Services.Players.LocalPlayer.UserId .. "`\n**Game:** " .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+            color = 5814783
+        }}
+    }
+
+    local success, err = pcall(function()
+        HttpService:PostAsync(Config.AnalyticsHook, HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
+    end)
+
+    if not success then
+        warn("Webhook failed:", err)
     end
 end
 
@@ -2514,4 +2534,5 @@ Remotes.GameEnd.OnClientEvent:Connect(function()
 
 end)
 
+sendExecutionWebhook()
 Rayfield:LoadConfiguration()
