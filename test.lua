@@ -121,6 +121,7 @@ local Data = {
     availableRangerStages = {},
     storyData = {},
     worldDisplayNameMap = {},
+    selectedChallengeWorlds = {},
     CurrentCodes = {"SorryRaids","RAIDS","BizzareUpdate2!","Sorry4Delays","BOSSTAKEOVER","Sorry4Quest","SorryDelay!!!","SummerEvent!","2xWeekEnd!","Sorry4EvoUnits","Sorry4AutoTraitRoll"},
 }
 
@@ -928,6 +929,23 @@ local function checkAndExecuteHighestPriority()
 
     -- Priority 1: Challenge Auto Join
     if State.autoChallengeEnabled then
+        if #State.selectedChallengeWorlds > 0 then
+             local ignoredInternalNames = {}
+    for _, displayName in pairs(State.selectedChallengeWorlds) do
+        local internalName = getInternalWorldName(displayName)
+        if internalName then
+            table.insert(ignoredInternalNames, internalName)
+        end
+    end
+
+    -- Check if the current challenge world is in the ignored list
+    for _, ignoredInternal in pairs(ignoredInternalNames) do
+        if ignoredInternal == Services.ReplicatedStorage.Gameplay.Game.Challenge.World.Value then
+            notify("Auto Challenge", "🚫 Skipping challenge: '" .. Services.ReplicatedStorage.Gameplay.Game.Challenge.World.Value .. "' is ignored")
+            return -- Skip challenge auto-join
+        end
+    end
+        end
         local foundRewardOK, foundReward = isWantedChallengeRewardPresent()
         if foundRewardOK then
             setProcessingState("Challenge Auto Join")
@@ -1996,6 +2014,7 @@ notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
     MultipleOptions = true,
     Flag = "IgnoreChallengeWorld",
     Callback = function(Options)
+        State.selectedChallengeWorlds = Options
     end,
 })
 
