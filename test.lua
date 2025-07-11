@@ -41,6 +41,7 @@ local Config = {
     maxRetryAttempts = 20,
     unitLevelCaps = {9, 9, 9, 9, 9, 9},
     unitDeployLevelCaps = {0, 0, 0, 0, 0, 0},
+    oldbartext = Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text,
 }
 
 local State = {
@@ -1462,7 +1463,7 @@ local function StreamerMode()
         billboard:FindFirstChild("PlayerName").Text = tostring(Services.Players.LocalPlayer.Name)
         billboard:FindFirstChild("Level").Text = "Level "..Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Level.Value
         billboard:FindFirstChild("Title").Text = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Title.Value
-        Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text = "Level "..Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Level.Value
+        Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text = Config.oldbartext
     end
     end  
 end
