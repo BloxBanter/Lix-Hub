@@ -929,6 +929,7 @@ local function checkAndExecuteHighestPriority()
 
     -- Priority 1: Challenge Auto Join
     if State.autoChallengeEnabled then
+        local skipChallenge = false
         if #Data.selectedChallengeWorlds > 0 then
              local ignoredInternalNames = {}
     for _, displayName in pairs(Data.selectedChallengeWorlds) do
@@ -942,10 +943,12 @@ local function checkAndExecuteHighestPriority()
     for _, ignoredInternal in pairs(ignoredInternalNames) do
         if ignoredInternal == Services.ReplicatedStorage.Gameplay.Game.Challenge.World.Value then
             notify("Auto Challenge", "🚫 Skipping challenge: '" .. Services.ReplicatedStorage.Gameplay.Game.Challenge.World.Value .. "' is ignored")
-            return -- Skip challenge auto-join
+            skipChallenge = true
+            break
         end
     end
         end
+        if not skipChallenge then
         local foundRewardOK, foundReward = isWantedChallengeRewardPresent()
         if foundRewardOK then
             setProcessingState("Challenge Auto Join")
@@ -955,6 +958,7 @@ local function checkAndExecuteHighestPriority()
             Remotes.PlayEvent:FireServer("Start")
             task.delay(5, clearProcessingState)
             return
+        end
         end
     end
 
@@ -2007,7 +2011,7 @@ notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
     end,
     })
 
-    local IgnoreChallengeDropdown = LobbyTab:CreateDropdown({
+    local IgnoreChallengeDropdown = JoinerTab:CreateDropdown({
     Name = "Ignore Challenges",
     Options = {},
     CurrentOption = {},
