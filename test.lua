@@ -1588,13 +1588,6 @@ end)
         end
     end)
 
-     task.spawn(function()
-        while true do
-            task.wait(0.5) -- Check every 0.5 seconds
-            enableLowPerformanceMode()
-        end
-    end)
-
     task.spawn(function()
         while true do
             task.wait(0.5) -- Check every 0.5 seconds
@@ -1750,8 +1743,13 @@ local Button = LobbyTab:CreateButton({
     Flag = "LowFPSMode",
     Callback = function(Value)
         State.enableLowPerformanceMode = Value
+        enableLowPerformanceMode()
     end,
 })
+
+if State.enableLowPerformanceMode then
+    enableLowPerformanceMode()
+end
 
 local Toggle = LobbyTab:CreateToggle({
     Name = "Auto Sell Rarities",
