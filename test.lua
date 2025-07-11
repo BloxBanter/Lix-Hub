@@ -1809,7 +1809,7 @@ local RaritySellerDropdown = LobbyTab:CreateDropdown({
     Flag = "RaritySellerSelector",
     Callback = function(Options)
         State.SelectedRaritiesToSell = Options
-        notify("Auto Sell Rarities","Selected Rarities: ",table.concat(Options, ", "))
+        notify("Auto Sell Rarities", "Selected Rarities: " .. table.concat(Options, ", "), 2)
     end,
 })
 
@@ -1838,7 +1838,7 @@ local Toggle = LobbyTab:CreateToggle({
     MultipleOptions = true,
     Flag = "MerchantPurchaseSelector",
     Callback = function(Options)
-        notify("Auto Purcahse Merchant Items","Selected Items: ",table.concat(Options, ", "))
+        notify("Auto Purcahse Merchant Items","Selected Items: " .. table.concat(Options, ", "), 2)
         Data.MerchantPurchaseTable = Options
     end,
     })
@@ -1918,7 +1918,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryStageSelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedWorld = Option[1]
-        notify("Auto Join Story","Selected Stage: "..Option[1])
+        notify("Auto Join Story","Selected Stage: "..Option[1], 2)
     end,
     })
 
@@ -1930,7 +1930,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryChapterSelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedChapter = Option[1]
-        notify("Auto Join Story","Selected Chapter: "..Option[1])
+        notify("Auto Join Story","Selected Chapter: "..Option[1], 2)
     end,
     })
     local DifficultyDropdown = JoinerTab:CreateDropdown({
@@ -1941,7 +1941,7 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "StoryDifficultySelector", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Option)
         State.selectedDifficulty = Option[1]
-notify("Auto Join Story","Selected Difficulty: "..Option[1])
+notify("Auto Join Story","Selected Difficulty: "..Option[1], 2)
     end,
     })
 
@@ -1979,7 +1979,7 @@ notify("Auto Join Story","Selected Difficulty: "..Option[1])
     Callback = function(options)
         Data.wantedRewards = options
         if #Data.wantedRewards > 0 then
-            notify("Auto Challenge","Selected Rewards: ",table.concat(Data.wantedRewards, ", "))
+            notify("Auto Challenge","Selected Rewards: " .. table.concat(Data.wantedRewards, ", "), 2)
         end
     end,
     })
@@ -2031,7 +2031,7 @@ notify("Auto Join Story","Selected Difficulty: "..Option[1])
             for _, stage in ipairs(Data.availableRangerStages) do
                 if stage.DisplayName == selectedDisplay then
                 table.insert(Data.selectedRawStages, stage.RawName)
-                notify("Auto Ranger Stage","Selected Stages: ",table.concat(Data.selectedRawStages, ", "))
+                notify("Auto Ranger Stage","Selected Stages: " .. table.concat(Data.selectedRawStages, ", "), 2)
                 break
                 end
             end
