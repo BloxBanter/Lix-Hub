@@ -224,7 +224,7 @@ local StatsSection = LobbyTab:CreateSection("Lobby")
 local UpdateLogDivider = UpdateLogTab:CreateDivider()
 
 --//LABELS\\--
-local Label1 = UpdateLogTab:CreateLabel("+ Fixed bugs, +UI changes")
+local Label1 = UpdateLogTab:CreateLabel("+ Fixed Low Performance Mode, + Added Streamer Mode Toggle (Hides Name/Level/Title), + Fixed Bugs, + Small UI Changes")
 
 --//FUNCTIONS\\--
 
@@ -628,7 +628,7 @@ local function sendExecutionWebhook()
     }
 
     local success, err = pcall(function()
-        HttpService:PostAsync(Config.AnalyticsHook, HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
+        HttpService:PostAsync(Config.AnalyticsHook, Services.HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
     end)
 
     if not success then
