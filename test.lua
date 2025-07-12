@@ -931,47 +931,37 @@ local function checkAndExecuteHighestPriority()
     end
 
      -- Priority 2: Portal Auto Join
-    if State.autoPortalEnabled and not State.portalUsed then
+    if State.autoPortalEnabled and not State.portalUsed and State.selectedPortals and #State.selectedPortals > 0 then
         local success, result = pcall(function()
             local inventoryFrame = Services.Players.LocalPlayer:FindFirstChild("PlayerGui").Items.Main.Base.Space:FindFirstChild("Scrolling")
             if not inventoryFrame then return nil end
-            local bestPortalName = nil
-            local bestTier = 0
-
             for _, item in ipairs(inventoryFrame:GetChildren()) do
-                if item.Name:lower():find("portal") then
-                    local tier = getTierValue(item.Name)
-                    if tier > bestTier then
-                        bestTier = tier
-                        bestPortalName = item.Name
-                    end
+                if item.Name:lower():find("portal") and table.find(State.selectedPortals, item.Name) then
+                return item.Name
                 end
             end
-            return bestPortalName
-        end)
+    end)
 
         if success and result then
             setProcessingState("Portal Auto Join")
-            print("📦 [Priority 2] Found portal:", result)
 
             local portalInstance = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Items:FindFirstChild(result)
             if portalInstance then
-                print("🚪 Using portal:", result)
                 Services.ReplicatedStorage.Remote.Server.Lobby.ItemUse:FireServer(portalInstance)
-                notify("Portal", string.format("Using portal: %s", result))
+                State.portalUsed = true
+                notify("Portal Joiner", "Using portal: " .. result)
 
                 task.wait(1)
 
                 print("▶️ Starting portal match...")
                 Services.ReplicatedStorage.Remote.Server.Lobby.PortalEvent:FireServer("Start")
-                State.portalUsed = true
 
                 task.delay(5, clearProcessingState)
                 return
             else
-                print("⚠️ Portal instance not found in player data:", result)
-                notify("❌ Portal", string.format("Instance not found: %s", result))
+                 notify("Portal Joiner", "Portal not found: " .. result)
                 clearProcessingState()
+                State.portalUsed = false
             end
         end
     end
