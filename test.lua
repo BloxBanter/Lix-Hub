@@ -61,6 +61,7 @@ local State = {
     lastDeploymentTimes = {},
     startingInventory = {},
     unitNameSet = {},
+    selectedPortals = {},
     
     -- Auto settings
     autoBossEventEnabled = false,
