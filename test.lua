@@ -34,7 +34,7 @@ GameObjects.getUnitFolder = GameObjects.GetData.GetUnitFolder
 GameObjects.itemsFolder = GameObjects.challengeFolder:WaitForChild("Items")
 
 local Config = {
-    DISCORD_USER_ID = nil,
+    DISCORD_USER_ID = "",
     chapters = {"Chapter1", "Chapter2", "Chapter3", "Chapter4", "Chapter5", "Chapter6", "Chapter7", "Chapter8", "Chapter9", "Chapter10"},
     difficulties = {"Normal", "Hard", "Nightmare"},
     UPGRADE_COOLDOWN = 0.5,
@@ -2045,6 +2045,32 @@ local Toggle = LobbyTab:CreateToggle({
     end,
     })
 
+     local PortalSelectorDropdown = JoinerTab:CreateDropdown({
+    Name = "Select Portals to join",
+    Options = {},
+    CurrentOption = {},
+    MultipleOptions = true,
+    Flag = "PortalSelector",
+    Callback = function(Options)
+        State.selectedPortals = Options
+    end,
+})
+
+task.spawn(function()
+    local portalNames = {}
+
+    local inventory = Services.Players.LocalPlayer:FindFirstChild("PlayerGui").Items.Main.Base.Space:FindFirstChild("Scrolling")
+    if inventory then
+        for _, item in ipairs(inventory:GetChildren()) do
+            if item:IsA("TextButton") and item.Name:lower():find("portal") then
+                table.insert(portalNames, item.Name)
+            end
+        end
+    end
+    PortalSelectorDropdown:Refresh(portalNames)
+end)
+
+
     local JoinerSection4 = JoinerTab:CreateSection("🏹 Ranger Stage Joiner 🏹")
 
         local Toggle = JoinerTab:CreateToggle({
@@ -2426,7 +2452,7 @@ task.spawn(function()
     local Input = WebhookTab:CreateInput({
     Name = "Input Discord ID (mention rares)",
     CurrentValue = "",
-    PlaceholderText = "Input UserID...",
+    PlaceholderText = "Input Discord ID...",
     RemoveTextAfterFocusLost = false,
     Flag = "WebhookInputUserID",
     Callback = function(Text)
