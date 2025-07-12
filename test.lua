@@ -134,7 +134,7 @@ local Window = Rayfield:CreateWindow({
    Name = "LixHub - [🏖️Summer Event] Anime Rangers X",
    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "Loading for Anime Rangers X",
-   LoadingSubtitle = "v0.0.2",
+   LoadingSubtitle = "v0.0.3",
    ShowText = "Rayfield", -- for mobile users to unhide rayfield, change if you'd like
    Theme = {
     TextColor = Color3.fromRGB(240, 240, 240),
@@ -2048,7 +2048,6 @@ local Toggle = LobbyTab:CreateToggle({
 })
 
 task.spawn(function()
-    while true do
         local portalNames = {}
 
         local inventory = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Items
@@ -2060,8 +2059,6 @@ task.spawn(function()
             end
         end
         PortalSelectorDropdown:Refresh(portalNames)
-        task.wait(5)
-    end
 end)
 
     local JoinerSection4 = JoinerTab:CreateSection("🏹 Ranger Stage Joiner 🏹")
