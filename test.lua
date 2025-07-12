@@ -2052,7 +2052,11 @@ task.spawn(function()
         local portalNames = {}
         local portalSet = {}
 
-        local inventory = Services.Players.LocalPlayer:FindFirstChild("PlayerGui").Items.Main.Base.Space:FindFirstChild("Scrolling")
+        local inventory = Services.Players.LocalPlayer:FindFirstChild("PlayerGui")
+        if inventory then
+            inventory = inventory:FindFirstChild("Items") and inventory.Items.Main.Base.Space:FindFirstChild("Scrolling")
+        end
+
         if inventory then
             for _, item in ipairs(inventory:GetChildren()) do
                 if item:IsA("TextButton") and item.Name:lower():find("portal") then
@@ -2062,23 +2066,25 @@ task.spawn(function()
             end
         end
 
-        PortalSelectorDropdown:Refresh(portalNames)
+        if #portalNames > 0 then
+            PortalSelectorDropdown:Refresh(portalNames)
 
-        -- Filter selected portals to keep only valid ones
-        local currentSelected = State.selectedPortals or {}
-        local validSelected = {}
+            local currentSelected = State.selectedPortals or {}
+            local validSelected = {}
 
-        for _, portal in ipairs(currentSelected) do
-            if portalSet[portal] then
-                table.insert(validSelected, portal)
+            for _, portal in ipairs(currentSelected) do
+                if portalSet[portal] then
+                    table.insert(validSelected, portal)
+                end
+            end
+
+            -- Only reset if the filtered list is smaller (some portals disappeared)
+            if #validSelected ~= #currentSelected then
+                PortalSelectorDropdown:Set(validSelected)
+                State.selectedPortals = validSelected
             end
         end
 
-        -- If any selected portals are no longer valid, reset the dropdown
-        if #validSelected ~= #currentSelected then
-            PortalSelectorDropdown:Set(validSelected)
-            State.selectedPortals = validSelected
-        end
         task.wait(5)
     end
 end)
