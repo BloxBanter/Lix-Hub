@@ -46,7 +46,6 @@ local Config = {
 }
 
 local State = {
-    -- Flags
     pendingChallengeReturn = false,
     hasSentWebhook = false,
     portalUsed = false,
@@ -65,7 +64,6 @@ local State = {
     selectedPortals = {},
     selectedCurses = {},
     
-    -- Auto settings
     autoBossEventEnabled = false,
     autoJoinEnabled = false,
     autoStartEnabled = false,
@@ -97,7 +95,6 @@ local State = {
     slotLastFailTime = {},
     slotExists = {},
     
-    -- Values
     matchResult = "Unknown",
     storedChallengeSerial = nil,
     selectedWorld = nil,
@@ -129,7 +126,6 @@ local Data = {
 }
 
 local ValidWebhook
-local visualBackup = nil
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
@@ -339,14 +335,13 @@ local function fetchStoryData()
                         if typeof(storyTable) == "table" and storyTable.StoryAble == true then
                             if storyTable.Name and storyTable.Ani_Names then
                                 table.insert(Data.storyData, {
-                                    SeriesName = storyTable.Name,        -- Nice display name (e.g., "Voocha Village")
-                                    InternalName = storyTable.Ani_Names, -- Internal name for remote (e.g., "OnePiece")
+                                    SeriesName = storyTable.Name,
+                                    InternalName = storyTable.Ani_Names,
                                     ModuleName = moduleScript.Name,
                                     Key = key
                                 })
 
                                 worldDisplayNameMap[storyTable.Ani_Names] = storyTable.Name
-                                --print("Found Series: " .. tostring(storyTable.Name) .. " -> " .. tostring(storyTable.Ani_Names))
                             end
                         end
                     end
@@ -448,10 +443,8 @@ end
 
 local function snapshotInventory()
     local snapshot = {}
-    State.unitNameSet = {} -- Reset each time
+    State.unitNameSet = {}
 
-
-    -- Track Currencies
     snapshot.Gold = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Gold.Value
     snapshot.Gem = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Gem.Value
     snapshot["Beach Balls"] = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data["Beach Balls"].Value
@@ -2195,7 +2188,7 @@ end)
     MultipleOptions = false,
     Flag = "RangerStageSelector",
     Callback = function(Options)
-        Data.selectedRawStages = {} -- Clear the array first
+        Data.selectedRawStages = {}
         
         for _, selectedDisplay in ipairs(Options) do
             for _, stage in ipairs(Data.availableRangerStages) do
@@ -2255,6 +2248,7 @@ task.spawn(function()
     })
 
     local JoinerSection6 = JoinerTab:CreateSection("🏰 Infinity Castle 🏰")
+    local Label3 = JoinerTab:CreateLabel("Infinity Castle Floor: "..Services.ReplicatedStorage.LeaderBoard.InfinityCastle[tostring(Services.Players.LocalPlayer.UserId)].Value, "castle")
 
        local Toggle = JoinerTab:CreateToggle({
     Name = "Auto Infinity Castle",
@@ -2383,7 +2377,7 @@ task.spawn(function()
         State.upgradeMethod = Options[1] or "Left to right until max"
         if State.autoUpgradeEnabled then
             stopAutoUpgrade()
-            resetUpgradeOrder() -- Reset when changing method
+            resetUpgradeOrder()
             State.gameRunning = true
             task.wait(0.5)
             startAutoUpgrade()
@@ -2589,7 +2583,7 @@ game.ReplicatedStorage.Remote.Replicate.OnClientEvent:Connect(function(...)
         if table.find(args, "Game_Start") then
             State.gameRunning = true
             State.startingInventory = snapshotInventory()
-        resetUpgradeOrder() -- Reset to slot 1 every time a new game starts
+        resetUpgradeOrder()
         stopRetryLoop()
         stopNextLoop()
         
@@ -2626,7 +2620,6 @@ Services.ReplicatedStorage.Remote.Client.UI.Challenge_Updated.OnClientEvent:Conn
 
 Remotes.GameEnd.OnClientEvent:Connect(function()
     if State.hasSentWebhook then
-            --print("⏳ Webhook still on cooldown…")
             return
         end
         State.hasGameEnded = true
