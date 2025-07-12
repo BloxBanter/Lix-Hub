@@ -1621,7 +1621,7 @@ local function StartAutoCurse(selectedCurses)
             task.wait(1)
 
             local applied = GetAppliedCurses()
-            if CursesMatch(applied, selectedCurses) then
+            if CursesMatch(applied, State.selectedCurses) then
                 print("✅ 2 green selected curses found. Done.")
                 break
             end
