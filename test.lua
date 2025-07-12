@@ -2050,42 +2050,19 @@ local Toggle = LobbyTab:CreateToggle({
 task.spawn(function()
     while true do
         local portalNames = {}
-        local portalSet = {}
 
-        local inventory = Services.Players.LocalPlayer:FindFirstChild("PlayerGui")
-        if inventory then
-            inventory = inventory:FindFirstChild("Items") and inventory.Items.Main.Base.Space:FindFirstChild("Scrolling")
-        end
-
+        local inventory = Services.Players.LocalPlayer:FindFirstChild("PlayerGui").Items.Main.Base.Space:FindFirstChild("Scrolling")
         if inventory then
             for _, item in ipairs(inventory:GetChildren()) do
                 if item:IsA("TextButton") and item.Name:lower():find("portal") then
                     table.insert(portalNames, item.Name)
-                    portalSet[item.Name] = true
                 end
             end
         end
 
-        if #portalNames > 0 then
-            PortalSelectorDropdown:Refresh(portalNames)
+        PortalSelectorDropdown:Refresh(portalNames)
 
-            local currentSelected = State.selectedPortals or {}
-            local validSelected = {}
-
-            for _, portal in ipairs(currentSelected) do
-                if portalSet[portal] then
-                    table.insert(validSelected, portal)
-                end
-            end
-
-            -- Only reset if the filtered list is smaller (some portals disappeared)
-            if #validSelected ~= #currentSelected then
-                PortalSelectorDropdown:Set(validSelected)
-                State.selectedPortals = validSelected
-            end
-        end
-
-        task.wait(5)
+        task.wait(5) 
     end
 end)
 
