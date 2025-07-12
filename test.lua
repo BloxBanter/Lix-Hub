@@ -1580,9 +1580,9 @@ local function GetAppliedCurses()
     for _, statFrame in pairs(main:GetChildren()) do
         if statFrame.Name == "StatTemp" then
             local icon = statFrame:FindFirstChild("StatsIconic")
-            local value = statFrame:FindFirstChild("Value")
-            if icon and value and value:IsA("TextLabel") then
-                local isGreen = (value.TextColor3 == Color3.fromRGB(112, 255, 110))
+            local buffIcon = statFrame:FindFirstChild("BuffIconic")
+            if icon and buffIcon then
+                local isGreen = buffIcon.Image == 73853750530888
                 print("[DEBUG] Found Curse Image:", icon.Image, "isGreen:", isGreen)
                 table.insert(results, {
                     image = icon.Image,
