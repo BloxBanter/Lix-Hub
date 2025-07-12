@@ -1582,9 +1582,11 @@ local function GetAppliedCurses()
             local icon = statFrame:FindFirstChild("StatsIconic")
             local value = statFrame:FindFirstChild("Value")
             if icon and value and value:IsA("TextLabel") then
+                local isGreen = (value.TextColor3 == Color3.fromRGB(112, 255, 110))
+                print("[DEBUG] Found Curse Image:", icon.Image, "isGreen:", isGreen)
                 table.insert(results, {
                     image = icon.Image,
-                    isGreen = (value.TextColor3 == Color3.fromRGB(112, 255, 110))
+                    isGreen = isGreen,
                 })
             end
         end
@@ -1598,10 +1600,14 @@ local function CursesMatch(applied, selected)
         for _, name in ipairs(selected) do
             if curse.image == CurseImageIDs[name] and curse.isGreen then
                 matched = matched + 1
+                 print("[DEBUG] Matched:", name, "[", appliedId, "]")
                 break
+            else
+                 print("[DEBUG] No Match:", name, "[", curse.image, "] vs [", CurseImageIDs[name], "]", "| Green:", curse.isGreen)
             end
         end
     end
+     print("[DEBUG] Total Matched:", matched)
     return matched >= 2
 end
 
