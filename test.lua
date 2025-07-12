@@ -2051,18 +2051,16 @@ task.spawn(function()
     while true do
         local portalNames = {}
 
-        local inventory = Services.Players.LocalPlayer:FindFirstChild("PlayerGui").Items.Main.Base.Space:FindFirstChild("Scrolling")
+        local inventory = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Items
         if inventory then
             for _, item in ipairs(inventory:GetChildren()) do
-                if item:IsA("TextButton") and item.Name:lower():find("portal") then
+                if item:IsA("Folder") and item.Name:lower():find("portal") and item:FindFirstChild("Amount").Value > 0 then
                     table.insert(portalNames, item.Name)
                 end
             end
         end
-
         PortalSelectorDropdown:Refresh(portalNames)
-
-        task.wait(5) 
+        task.wait(5)
     end
 end)
 
