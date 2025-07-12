@@ -22,6 +22,7 @@ do
     Remotes.NextEvent = RS:WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext")
     Remotes.SelectWay = RS:WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Units"):WaitForChild("SelectWay")
     Remotes.SellRemote = RS:WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Units"):WaitForChild("Sell")
+    Remotes.ApplyCurseRemote = RS:WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Gambling"):WaitForChild("ApplyCurse")
 end
 
 local GameObjects = {
@@ -62,6 +63,7 @@ local State = {
     startingInventory = {},
     unitNameSet = {},
     selectedPortals = {},
+    selectedCurses = {},
     
     -- Auto settings
     autoBossEventEnabled = false,
@@ -89,6 +91,7 @@ local State = {
     streamerModeEnabled = false,
     enableLowPerformanceMode = false,
     SendStageCompletedWebhook = false,
+    AutoCurseEnabled = false,
     SelectedRaritiesToSell = {},
     currentSlot = 1,
     slotLastFailTime = {},
@@ -1560,7 +1563,75 @@ local function getunitRarity(unit)
     return success and result or nil
 end
 
+local CurseImageIDs = {
+    ["Ability Damage"] = "rbxassetid://129472130637846",
+    ["Ability Cooldown"] = "rbxassetid://94734246361320",
+    ["Health"] = "rbxassetid://132403000977312",
+    ["Damage"] = "rbxassetid://128960075980851",
+    ["Attack Cooldown"] = "rbxassetid://102308191455123",
+    ["Range"] = "rbxassetid://105399018590765",
+    ["Speed"] = "rbxassetid://131770445081586",
+}
 
+local function GetAppliedCurses()
+    local main = Services.Players.LocalPlayer.PlayerGui:WaitForChild("ApplyCurse").Main.Base.Stats.Main
+    local results = {}
+
+    for _, statFrame in pairs(main:GetChildren()) do
+        if statFrame.Name == "StatTemp" then
+            local icon = statFrame:FindFirstChild("StatsIconic")
+            local value = statFrame:FindFirstChild("Value")
+            if icon and value and value:IsA("TextLabel") then
+                table.insert(results, {
+                    image = icon.Image,
+                    isGreen = (value.TextColor3 == Color3.fromRGB(112, 255, 110))
+                })
+            end
+        end
+    end
+    return results
+end
+
+local function CursesMatch(applied, selected)
+    local matched = 0
+    for _, curse in ipairs(applied) do
+        for _, name in ipairs(selected) do
+            if curse.image == CurseImageIDs[name] and curse.isGreen then
+                matched = matched + 1
+                break
+            end
+        end
+    end
+    return matched >= 2
+end
+
+local function StartAutoCurse(selectedCurses)
+    local running = true
+
+    task.spawn(function()
+        while running do
+            local unit = Services.Players.LocalPlayer.PlayerGui:WaitForChild("ApplyCurse").Main.Base.Unit.Frame.UnitFrame.Info.Folder.Value
+            if not unit then
+                warn("No unit selected")
+                task.wait(1)
+                continue
+            end
+
+            Remotes.ApplyCurseRemote:FireServer("ApplyCurse - Normal", unit)
+            task.wait(1)
+
+            local applied = GetAppliedCurses()
+            if CursesMatch(applied, selectedCurses) then
+                print("✅ 2 green selected curses found. Done.")
+                break
+            end
+        end
+    end)
+
+    return function()
+        running = false
+    end
+end
 
 --//\\--
 
@@ -1760,9 +1831,32 @@ end)
         end
     end)
 
-    
-
 --//BUTTONS\\--
+
+    local Toggle = GameTab:CreateToggle({
+    Name = "Auto Curse (open curse UI and select unit manually)",
+    CurrentValue = false,
+    Flag = "AutoCurseToggle",
+    Callback = function(Value)
+        State.AutoCurseEnabled = Value
+        if #State.selectedCurses >= 2 and State.AutoCurseEnabled then
+            StartAutoCurse(State.selectedCurses)
+        end
+    end,
+})
+
+local CurseSelectorDropdown = LobbyTab:CreateDropdown({
+    Name = "Select Curses",
+    Options = {"Ability Damage","Ability Cooldown","Health","Damage","Attack Cooldown","Range","Speed"},
+    CurrentOption = {},
+    MultipleOptions = true,
+    Flag = "CurseSelector",
+    Callback = function(Options)
+        State.selectedCurses = Options
+    end,
+})
+
+
 
 local Button = LobbyTab:CreateButton({
         Name = "Return to lobby",
