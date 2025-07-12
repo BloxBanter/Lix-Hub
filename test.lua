@@ -1612,10 +1612,9 @@ local function CursesMatch(applied, selected)
 end
 
 local function StartAutoCurse(selectedCurses)
-    local running = true
 
     task.spawn(function()
-        while running do
+        while State.AutoCurseEnabled do
             local unit = Services.Players.LocalPlayer.PlayerGui:WaitForChild("ApplyCurse").Main.Base.Unit.Frame.UnitFrame.Info.Folder.Value
             if not unit then
                 warn("No unit selected")
@@ -1633,10 +1632,6 @@ local function StartAutoCurse(selectedCurses)
             end
         end
     end)
-
-    return function()
-        running = false
-    end
 end
 
 --//\\--
@@ -1839,7 +1834,7 @@ end)
 
 --//BUTTONS\\--
 
-    local Toggle = GameTab:CreateToggle({
+    local Toggle = LobbyTab:CreateToggle({
     Name = "Auto Curse (open curse UI and select unit manually)",
     CurrentValue = false,
     Flag = "AutoCurseToggle",
