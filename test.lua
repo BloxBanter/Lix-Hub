@@ -1582,7 +1582,7 @@ local function GetAppliedCurses()
             local icon = statFrame:FindFirstChild("StatsIconic")
             local buffIcon = statFrame:FindFirstChild("BuffIconic")
             if icon and buffIcon then
-                local isGreen = buffIcon.Image == 73853750530888
+                local isGreen = buffIcon.Image == "rbxassetid://73853750530888"
                 print("[DEBUG] Found Curse Image:", icon.Image, "isGreen:", isGreen)
                 table.insert(results, {
                     image = icon.Image,
