@@ -2248,7 +2248,6 @@ task.spawn(function()
     })
 
     local JoinerSection6 = JoinerTab:CreateSection("🏰 Infinity Castle 🏰")
-    local Label3 = JoinerTab:CreateLabel("Infinity Castle Floor: "..Services.ReplicatedStorage.LeaderBoard.InfinityCastle[tostring(Services.Players.LocalPlayer.UserId)].Value, "castle")
 
        local Toggle = JoinerTab:CreateToggle({
     Name = "Auto Infinity Castle",
