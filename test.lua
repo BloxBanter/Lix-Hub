@@ -203,7 +203,7 @@ local Window = Rayfield:CreateWindow({
       FileName = "LixHub_Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
       SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
       GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"ARX_FREE"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+      Key = {"ARX_FR33"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
    }
 })
 
@@ -2048,19 +2048,27 @@ local Toggle = LobbyTab:CreateToggle({
 })
 
 task.spawn(function()
-    local portalNames = {}
+    while true do
+        local portalNames = {}
 
-    local inventory = Services.Players.LocalPlayer:FindFirstChild("PlayerGui").Items.Main.Base.Space:FindFirstChild("Scrolling")
-    if inventory then
-        for _, item in ipairs(inventory:GetChildren()) do
-            if item:IsA("TextButton") and item.Name:lower():find("portal") then
-                table.insert(portalNames, item.Name)
+        local inventory = Services.Players.LocalPlayer:FindFirstChild("PlayerGui").Items.Main.Base.Space:FindFirstChild("Scrolling")
+        if inventory then
+            for _, item in ipairs(inventory:GetChildren()) do
+                if item:IsA("TextButton") and item.Name:lower():find("portal") then
+                    table.insert(portalNames, item.Name)
+                end
             end
         end
-    end
-    PortalSelectorDropdown:Refresh(portalNames)
-end)
 
+        PortalSelectorDropdown:Refresh(portalNames)
+
+        if #portalNames == 0 then
+            PortalSelectorDropdown:Set({})
+        end
+
+        task.wait(5) -- Add a delay to avoid crashing the game
+    end
+end)
 
     local JoinerSection4 = JoinerTab:CreateSection("🏹 Ranger Stage Joiner 🏹")
 
@@ -2074,7 +2082,7 @@ end)
     })
 
     local RangerStageDropdown = JoinerTab:CreateDropdown({
-    Name = "Select Ranger Stages To Join",
+    Name = "Select Ranger Stage To Join",
     Options = {},
     CurrentOption = {},
     MultipleOptions = false,
