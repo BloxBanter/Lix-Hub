@@ -494,13 +494,27 @@ local function compareInventories(startInv, endInv)
     return gained
 end
 
+local function patchRewardsFromFolder(existingGained, detectedRewards, detectedUnits, lines)
+    local rewardFolder = Services.Players.LocalPlayer:FindFirstChild("RewardsShow")
+    if not rewardFolder then return end
+
+    for _, rewardEntry in pairs(rewardFolder:GetChildren()) do
+        if not detectedRewards[rewardEntry.Name] and rewardEntry:FindFirstChild("Amount") then
+            local amount = rewardEntry.Amount.Value
+            if amount > 0 then
+                detectedRewards[rewardEntry.Name] = amount
+                table.insert(existingGained, { name = rewardEntry.Name, amount = amount, isUnit = false })
+                table.insert(lines, string.format("+ %s %s [via fallback]", amount, rewardEntry.Name))
+            end
+        end
+    end
+end
+
 local function buildRewardsText()
     local endingInventory = snapshotInventory()
     local gainedItems = compareInventories(State.startingInventory, endingInventory)
 
-    if #gainedItems == 0 then
-        return "_No rewards found after match_", {}, {}
-    end
+    
 
     local lines = {}
     local detectedRewards = {}
@@ -532,6 +546,12 @@ local function buildRewardsText()
             totalText = totalAmount and string.format(" [%d total]", totalAmount) or ""
             table.insert(lines, string.format("+ %s %s%s", amount, itemName, totalText))
         end
+    end
+
+    patchRewardsFromFolder(gainedItems, detectedRewards, detectedUnits, lines)
+
+    if #gainedItems == 0 then
+        return "_No rewards found after match_", {}, {}
     end
 
     local rewardsText = table.concat(lines, "\n")
@@ -1612,18 +1632,18 @@ local function CursesMatch(applied, selected)
 end
 
 local function StartAutoCurse(selectedCurses)
-
+    if isInLobby() then 
     task.spawn(function()
         while State.AutoCurseEnabled do
             local unit = Services.Players.LocalPlayer.PlayerGui:WaitForChild("ApplyCurse").Main.Base.Unit.Frame.UnitFrame.Info.Folder.Value
             if not unit then
-                warn("No unit selected")
-                task.wait(1)
+                notify("Auto Curse","Curse UI/Selected unit are not present!")
+                task.wait(3)
                 continue
             end
 
             Remotes.ApplyCurseRemote:FireServer("ApplyCurse - Normal", unit)
-            task.wait(1)
+            task.wait(2)
 
             local applied = GetAppliedCurses()
             if CursesMatch(applied, State.selectedCurses) then
@@ -1632,6 +1652,7 @@ local function StartAutoCurse(selectedCurses)
             end
         end
     end)
+    end
 end
 
 --//\\--
