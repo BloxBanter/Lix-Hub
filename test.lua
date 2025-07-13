@@ -220,14 +220,14 @@ local WebhookTab = Window:CreateTab("Webhook", "bluetooth")
 
 --//SECTIONS\\--
 
-local UpdateLogSection = UpdateLogTab:CreateSection("11/07/2025")
+local UpdateLogSection = UpdateLogTab:CreateSection("13/07/2025")
 local StatsSection = LobbyTab:CreateSection("🏢 Lobby 🏢")
 
 --//DIVIDERS\\--
 local UpdateLogDivider = UpdateLogTab:CreateDivider()
 
 --//LABELS\\--
-local Label1 = UpdateLogTab:CreateLabel("Too much to list check it out for yourself - enjoy")
+local Label1 = UpdateLogTab:CreateLabel("Too much to list, check it out for yourself - enjoy")
 local Label2 = UpdateLogTab:CreateLabel("Also please join the discord: https://discord.gg/cYKnXE2Nf8")
 
 --//FUNCTIONS\\--
@@ -669,7 +669,7 @@ end
 local function getPathAverages()
     local avg = {}
     for i = 1, 4 do
-        local folder = paths:WaitForChild("P" .. i)
+        local folder = Services.Workspace.WayPoint:WaitForChild("P" .. i)
         local total, count = Vector3.zero, 0
 
         for _, part in ipairs(folder:GetChildren()) do
@@ -1707,28 +1707,30 @@ end
 
 local function StartAutoCurse(selectedCurses)
     if isInLobby() then
-    task.spawn(function()
-        while State.AutoCurseEnabled do
-            local unit = Services.Players.LocalPlayer.PlayerGui:WaitForChild("ApplyCurse").Main.Base.Unit.Frame.UnitFrame.Info.Folder.Value
-            if not unit then
-                notify("Auto Curse","Curse UI/Selected unit are not present!")
-                task.wait(3)
-                continue
-            end
+        task.spawn(function()
+            while State.AutoCurseEnabled do
+                local unit = Services.Players.LocalPlayer.PlayerGui:WaitForChild("ApplyCurse").Main.Base.Unit.Frame.UnitFrame.Info.Folder.Value
 
-            Remotes.ApplyCurseRemote:FireServer("ApplyCurse - Normal", unit)
-            task.wait(1.5)
+                if not unit then
+                    notify("Auto Curse","Curse UI/Selected unit are not present!")
+                    task.wait(3)
+                else
+                    Remotes.ApplyCurseRemote:FireServer("ApplyCurse - Normal", unit)
+                    task.wait(1.5)
 
-            local applied = GetAppliedCurses()
-            if CursesMatch(applied, State.selectedCurses) then
-                print("✅ 2 green selected curses found. Done.")
-                notify("Auto Curse", "Done! You can now turn off auto curse")
-                break
+                    local applied = GetAppliedCurses()
+
+                    if CursesMatch(applied, State.selectedCurses) then
+                        print("✅ 2 green selected curses found. Done.")
+                        notify("Auto Curse", "Done! You can now turn off auto curse")
+                        break
+                    end
+                end
             end
-        end
-    end)
+        end)
     end
 end
+
 
 --//\\--
 
@@ -2119,6 +2121,7 @@ local Toggle = LobbyTab:CreateToggle({
 task.spawn(function()
     while true do
         task.wait(1)
+        if isInLobby() then return end
         if State.autoPlayBossRushEnabled then
             local enemyCounts = {P1 = 0, P2 = 0, P3 = 0, P4 = 0}
             local towerCounts = {P1 = 0, P2 = 0, P3 = 0, P4 = 0}
