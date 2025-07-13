@@ -249,13 +249,14 @@ local function createLowPerfGround()
     ground.Name = "LowPerfGround"
     ground.Anchored = true
     ground.Size = Vector3.new(1000, 1, 1000)
-    ground.Position = Vector3.new(char.HumanoidRootPart.Position.X, char.HumanoidRootPart.Position.Y - 5, char.HumanoidRootPart.Position.Z)
+    ground.Position = Vector3.new(char.HumanoidRootPart.Position.X, char.HumanoidRootPart.Position.Y - 0.5, char.HumanoidRootPart.Position.Z)
     ground.Transparency = 1
     ground.CanCollide = true
     ground.Parent = Services.Workspace
 end
 
 local function enableDeleteMap()
+    if isInLobby() then return end
     if State.enableDeleteMap then
         local map = Services.Workspace:FindFirstChild("Building"):FindFirstChild("Map")
 
