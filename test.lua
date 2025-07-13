@@ -92,6 +92,7 @@ local State = {
     AutoCurseEnabled = false,
     enableDeleteMap = false,
     autoBossRushEnabled = false,
+    autoPlayBossRushEnabled = false,
     SelectedRaritiesToSell = {},
     currentSlot = 1,
     slotLastFailTime = {},
@@ -665,6 +666,39 @@ local function countPartsOnPath(folder, pathFolder)
     return count
 end
 
+local function getPathAverages()
+    local avg = {}
+    for i = 1, 4 do
+        local folder = paths:WaitForChild("P" .. i)
+        local total, count = Vector3.zero, 0
+
+        for _, part in ipairs(folder:GetChildren()) do
+            if part:IsA("BasePart") then
+                total = total + part.Position
+                count = count + 1
+            end
+        end
+
+        avg["P" .. i] = count > 0 and total / count or Vector3.zero
+    end
+    return avg
+end
+
+local function nearestPath(pos)
+    local avg = getPathAverages()
+    local best, dist = nil, math.huge
+
+    for name, center in pairs(avg) do
+        local d = (pos - center).Magnitude
+        if d < dist then
+            dist = d
+            best = name
+        end
+    end
+
+    return best
+end
+
 local function getBestPath()
     local bestPath, lowestUnits = nil, math.huge
     for i = 1, 3 do
@@ -1005,6 +1039,7 @@ local function checkAndExecuteHighestPriority()
     if State.autoBossRushEnabled then
         setProcessingState("Boss Rush Auto Join")
         Remotes.PlayEvent:FireServer("BossRush")
+        task.wait(1)
         Services.ReplicatedStorage:WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer("Start")
         task.delay(5, clearProcessingState)
         return
@@ -1343,11 +1378,11 @@ local function autoUltimateLoop()
             for _, unitData in pairs(unitsWithUltimates) do
                 if not State.AutoUltimateEnabled then break end
                 fireUltimateForUnit(unitData)
-                task.wait(0.1) -- Prevent server spam
+                task.wait(0.1)
             end
         end
 
-        task.wait(1) -- Check again after 1 second
+        task.wait(1)
     end
 
     print("🛑 Auto Ultimate loop stopped")
@@ -2071,6 +2106,54 @@ local Toggle = LobbyTab:CreateToggle({
         State.autoBossRushEnabled = Value
     end,
     })
+
+    local Toggle = JoinerTab:CreateToggle({
+    Name = "Autoplay - Boss Rush",
+    CurrentValue = false,
+    Flag = "AutoPlayBossRush",
+    Callback = function(Value)
+        State.autoPlayBossRushEnabled = Value
+    end,
+    })
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if State.autoPlayBossRushEnabled then
+            local enemyCounts = {P1 = 0, P2 = 0, P3 = 0, P4 = 0}
+            local towerCounts = {P1 = 0, P2 = 0, P3 = 0, P4 = 0}
+
+            for _, enemy in ipairs(WS.Agent.EnemyT:GetChildren()) do
+                if enemy:IsA("BasePart") then
+                    local path = nearestPath(enemy.Position)
+                    if path then enemyCounts[path] = enemyCounts[path] + 1 end
+                end
+            end
+
+            for _, tower in ipairs(WS.Agent.UnitT:GetChildren()) do
+                if tower:IsA("BasePart") then
+                    local path = nearestPath(tower.Position)
+                    if path then towerCounts[path] = towerCounts[path] + 1 end
+                end
+            end
+
+            local bestPathIndex = 1
+            local highestScore = -math.huge
+
+            for i = 1, 4 do
+                local pathName = "P" .. i
+                local score = enemyCounts[pathName] - towerCounts[pathName]
+                if score > highestScore then
+                    highestScore = score
+                    bestPathIndex = i
+                end
+            end
+
+            Remotes.SelectWay:FireServer(bestPathIndex)
+        end
+    end
+end)
+
 
     local JoinerSection0 = JoinerTab:CreateSection("👹 Boss Event Joiner 👹")
 
