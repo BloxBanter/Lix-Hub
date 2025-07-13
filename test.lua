@@ -2123,14 +2123,14 @@ task.spawn(function()
             local enemyCounts = {P1 = 0, P2 = 0, P3 = 0, P4 = 0}
             local towerCounts = {P1 = 0, P2 = 0, P3 = 0, P4 = 0}
 
-            for _, enemy in ipairs(WS.Agent.EnemyT:GetChildren()) do
+            for _, enemy in ipairs(Services.Workspace.Agent.EnemyT:GetChildren()) do
                 if enemy:IsA("BasePart") then
                     local path = nearestPath(enemy.Position)
                     if path then enemyCounts[path] = enemyCounts[path] + 1 end
                 end
             end
 
-            for _, tower in ipairs(WS.Agent.UnitT:GetChildren()) do
+            for _, tower in ipairs(Services.Workspace.Agent.UnitT:GetChildren()) do
                 if tower:IsA("BasePart") then
                     local path = nearestPath(tower.Position)
                     if path then towerCounts[path] = towerCounts[path] + 1 end
