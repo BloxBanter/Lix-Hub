@@ -90,6 +90,8 @@ local State = {
     enableLowPerformanceMode = false,
     SendStageCompletedWebhook = false,
     AutoCurseEnabled = false,
+    enableDeleteMap = false,
+    autoBossRushEnabled = false,
     SelectedRaritiesToSell = {},
     currentSlot = 1,
     slotLastFailTime = {},
@@ -194,7 +196,7 @@ local Window = Rayfield:CreateWindow({
       RememberJoins = true -- Set this to false to make them join the discord every time they load it up
    },
 
-   KeySystem = true, -- Set this to true to use our key system
+   KeySystem = false, -- Set this to true to use our key system
    KeySettings = {
       Title = "LixHub - ARX - Free",
       Subtitle = "LixHub - Key System",
@@ -225,6 +227,7 @@ local UpdateLogDivider = UpdateLogTab:CreateDivider()
 
 --//LABELS\\--
 local Label1 = UpdateLogTab:CreateLabel("+ Fixed Low Performance Mode, + Added Streamer Mode Toggle (Hides Name/Level/Title), + Fixed Bugs, + Small UI Changes")
+local Label2 = UpdateLogTab:CreateLabel("Also please join the discord: https://discord.gg/cYKnXE2Nf8")
 
 --//FUNCTIONS\\--
 
@@ -239,6 +242,29 @@ local function notify(title, content, duration)
 
 local function isInLobby()
     return workspace:FindFirstChild("Lobby") ~= nil
+end
+
+local function createLowPerfGround()
+    local char = Services.Players.LocalPlayer.Character or Services.Players.LocalPlayer.CharacterAdded:Wait()
+    ground.Name = "LowPerfGround"
+    ground.Anchored = true
+    ground.Size = Vector3.new(1000, 1, 1000)
+    ground.Position = Vector3.new(char.HumanoidRootPart.Position.X, char.HumanoidRootPart.Position.Y - 5, char.HumanoidRootPart.Position.Z)
+    ground.Transparency = 1
+    ground.CanCollide = true
+    ground.Parent = Services.Workspace
+end
+
+local function enableDeleteMap()
+    if State.enableDeleteMap then
+        local map = Services.Workspace:FindFirstChild("Map")
+
+    if map then map:Destroy() end
+
+    if not Services.Workspace:FindFirstChild("LowPerfGround") then
+        createLowPerfGround()
+    end
+    end
 end
 
 local function enableLowPerformanceMode()
@@ -855,7 +881,10 @@ local function setProcessingState(action)
         notify("🔄 Processing: ", action)
 
         elseif action == "Boss Event Auto Join" then
-           notify("🔄 Processing: ", action) 
+           notify("🔄 Processing: ", action)
+
+           elseif action == "Boss Rush Auto Join" then
+            notify("🔄 Processing: ", action)
     end
 end
 
@@ -982,6 +1011,14 @@ local function checkAndExecuteHighestPriority()
             end
         end
     end
+
+    if State.autoBossRushEnabled then
+        setProcessingState("Boss Rush Auto Join")
+        Remotes.PlayEvent:FireServer("Boss-Rush")
+        task.delay(5, clearProcessingState)
+        return
+    end
+
     -- priority 3: boss event auto join
     if State.autoBossEventEnabled then
     setProcessingState("Boss Event Auto Join")
@@ -1520,21 +1557,39 @@ local function startAutoPlay()
 end
 
 local function StreamerMode()
-     local head = Services.Players.LocalPlayer.Character:WaitForChild("Head", 5)
+    local head = Services.Players.LocalPlayer.Character:WaitForChild("Head", 5)
+    if not head then return end
+
     local billboard = head:FindFirstChild("PlayerHeadGui")
-     if billboard then
+    if not billboard then return end
+
+    local originalNumbers = Services.Players.LocalPlayer.PlayerGui:WaitForChild("HUD"):WaitForChild("ExpBar"):FindFirstChild("Numbers")
+    if not originalNumbers then return end
+
+    local streamerLabel = Services.Players.LocalPlayer.PlayerGui:WaitForChild("HUD"):WaitForChild("ExpBar"):FindFirstChild("Numbers_Streamer")
+    if not streamerLabel then
+        streamerLabel = originalNumbers:Clone()
+        streamerLabel.Name = "Numbers_Streamer"
+        streamerLabel.Text = "Level 999 - Protected by Lixhub"
+        streamerLabel.Visible = false
+        streamerLabel.Parent = originalNumbers.Parent
+    end
+
     if State.streamerModeEnabled then
         billboard:FindFirstChild("PlayerName").Text = "🔥 Protected By LixHub 🔥"
         billboard:FindFirstChild("Level").Text = "Level 999"
         billboard:FindFirstChild("Title").Text = "Lixhub User"
-        Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text = "Level 999 - Protected by Lixhub"
-        else
+
+        originalNumbers.Visible = false
+        streamerLabel.Visible = true
+    else
         billboard:FindFirstChild("PlayerName").Text = tostring(Services.Players.LocalPlayer.Name)
-        billboard:FindFirstChild("Level").Text = "Level "..Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Level.Value
-        billboard:FindFirstChild("Title").Text = Services.ReplicatedStorage.Player_Data[Services.Players.LocalPlayer.Name].Data.Title.Value
-        Services.Players.LocalPlayer.PlayerGui.HUD.ExpBar.Numbers.Text = Config.oldbartext
+        billboard:FindFirstChild("Level").Text = "Level " .. Services.ReplicatedStorage:WaitForChild("Player_Data")[Services.Players.LocalPlayer.Name].Data.Level.Value
+        billboard:FindFirstChild("Title").Text = Services.ReplicatedStorage:WaitForChild("Player_Data")[Services.Players.LocalPlayer.Name].Data.Title.Value
+
+        originalNumbers.Visible = true
+        streamerLabel.Visible = false
     end
-    end  
 end
 
 local function startRetryLoop()
@@ -1636,11 +1691,12 @@ local function StartAutoCurse(selectedCurses)
             end
 
             Remotes.ApplyCurseRemote:FireServer("ApplyCurse - Normal", unit)
-            task.wait(2)
+            task.wait(1.5)
 
             local applied = GetAppliedCurses()
             if CursesMatch(applied, State.selectedCurses) then
                 print("✅ 2 green selected curses found. Done.")
+                notify("Auto Curse", "Done! You can now turn off auto curse")
                 break
             end
         end
@@ -1729,19 +1785,10 @@ end)
 
     task.spawn(function()
         while true do
-            task.wait(0.5) -- Check every 0.5 seconds
+            task.wait(0.1)
             StreamerMode()
         end
     end)
-
-    task.spawn(function()
-    while true do
-        wait(0.5)
-    if Services.Players.LocalPlayer.Character then
-        StreamerMode()
-    end
-    end
-end)
 
 task.spawn(function()
     while true do
@@ -1909,8 +1956,22 @@ local Button = LobbyTab:CreateButton({
     end,
 })
 
+    local Toggle = GameTab:CreateToggle({
+    Name = "Delete Map (Improve Performance)",
+    CurrentValue = false,
+    Flag = "enableDeleteMap",
+    Callback = function(Value)
+        State.enableDeleteMap = Value
+        enableDeleteMap()
+    end,
+})
+
 if State.enableLowPerformanceMode then
     enableLowPerformanceMode()
+end
+
+if State.enableDeleteMap then
+    enableDeleteMap()
 end
 
 local Toggle = LobbyTab:CreateToggle({
@@ -2009,6 +2070,17 @@ local Toggle = LobbyTab:CreateToggle({
     end,
 })
 
+    local JoinerSection0 = JoinerTab:CreateSection("🤖 Boss Rush Joiner 🤖")
+
+       local Toggle = JoinerTab:CreateToggle({
+    Name = "Boss Rush Joiner",
+    CurrentValue = false,
+    Flag = "AutoBossRushToggle",
+    Callback = function(Value)
+        State.autoBossRushEnabled = Value
+    end,
+    })
+
     local JoinerSection0 = JoinerTab:CreateSection("👹 Boss Event Joiner 👹")
 
     local AutoJoinBossEventToggle = JoinerTab:CreateToggle({
@@ -2066,9 +2138,18 @@ local Toggle = LobbyTab:CreateToggle({
     end,
     })
 
+    local rewardNames = {}
+
+    for _, reward in ipairs(GameObjects.itemsFolder:GetChildren()) do
+        if reward:IsA("Folder") then
+            table.insert(rewardNames, reward.Name)
+        end
+    end
 
 
     local JoinerSection2 = JoinerTab:CreateSection("🏆 Challenge Joiner 🏆")
+    local rewardText = #rewardNames > 0 and table.concat(rewardNames, ", ") or "None"
+    local Label3 = JoinerTab:CreateLabel("Current Challenge Rewards: " .. rewardText, "gift")
 
         local Toggle = JoinerTab:CreateToggle({
     Name = "Challenge Joiner",
@@ -2087,9 +2168,6 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "IgnoreChallengeWorld",
     Callback = function(Options)
         Data.selectedChallengeWorlds = Options
-        --if #Data.selectedChallengeWorlds > 0 then
-        --notify("Auto Challenge", "Selected Worlds: " .. table.concat(Options, ", "), 2)
-        --end
     end,
 })
 
@@ -2116,9 +2194,6 @@ local Toggle = LobbyTab:CreateToggle({
     Flag = "ChallengeRewardSelector",
     Callback = function(options)
         Data.wantedRewards = options
-       -- if #Data.wantedRewards > 0 then
-        --    notify("Auto Challenge","Selected Rewards: " .. table.concat(Data.wantedRewards, ", "), 2)
-       -- end
     end,
     })
 
