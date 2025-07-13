@@ -226,7 +226,7 @@ local StatsSection = LobbyTab:CreateSection("🏢 Lobby 🏢")
 local UpdateLogDivider = UpdateLogTab:CreateDivider()
 
 --//LABELS\\--
-local Label1 = UpdateLogTab:CreateLabel("+ Added delete map, + Fixed Bugs, + Small UI Changes, + Auto boss rush, + Auto Curse Units - Enjoy.")
+local Label1 = UpdateLogTab:CreateLabel("Too much to list check it out for yourself - enjoy")
 local Label2 = UpdateLogTab:CreateLabel("Also please join the discord: https://discord.gg/cYKnXE2Nf8")
 
 --//FUNCTIONS\\--
@@ -244,27 +244,15 @@ local function isInLobby()
     return workspace:FindFirstChild("Lobby") ~= nil
 end
 
-local function createLowPerfGround()
-    local char = Services.Players.LocalPlayer.Character or Services.Players.LocalPlayer.CharacterAdded:Wait()
-    ground.Name = "LowPerfGround"
-    ground.Anchored = true
-    ground.Size = Vector3.new(1000, 1, 1000)
-    ground.Position = Vector3.new(char.HumanoidRootPart.Position.X, char.HumanoidRootPart.Position.Y - 0.5, char.HumanoidRootPart.Position.Z)
-    ground.Transparency = 1
-    ground.CanCollide = true
-    ground.Parent = Services.Workspace
-end
-
 local function enableDeleteMap()
     if isInLobby() then return end
     if State.enableDeleteMap then
         local map = Services.Workspace:FindFirstChild("Building"):FindFirstChild("Map")
 
-    if map then map:Destroy() end
-
-    if not Services.Workspace:FindFirstChild("LowPerfGround") then
-        createLowPerfGround()
-    end
+    if map then 
+        map:Destroy() 
+         Services.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = true
+    end    
     end
 end
 
@@ -1016,7 +1004,8 @@ local function checkAndExecuteHighestPriority()
 
     if State.autoBossRushEnabled then
         setProcessingState("Boss Rush Auto Join")
-        Remotes.PlayEvent:FireServer("Boss-Rush")
+        Remotes.PlayEvent:FireServer("BossRush")
+        Services.ReplicatedStorage:WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer("Start")
         task.delay(5, clearProcessingState)
         return
     end
@@ -1682,7 +1671,7 @@ local function CursesMatch(applied, selected)
 end
 
 local function StartAutoCurse(selectedCurses)
-    if isInLobby() then 
+    if isInLobby() then
     task.spawn(function()
         while State.AutoCurseEnabled do
             local unit = Services.Players.LocalPlayer.PlayerGui:WaitForChild("ApplyCurse").Main.Base.Unit.Frame.UnitFrame.Info.Folder.Value
