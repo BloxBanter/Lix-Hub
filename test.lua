@@ -124,7 +124,7 @@ local Data = {
     storyData = {},
     worldDisplayNameMap = {},
     selectedChallengeWorlds = {},
-    CurrentCodes = {"SorryRaids","RAIDS","BizzareUpdate2!","Sorry4Delays","BOSSTAKEOVER","Sorry4Quest","SorryDelay!!!","SummerEvent!","2xWeekEnd!","Sorry4EvoUnits","Sorry4AutoTraitRoll"},
+    CurrentCodes = {"SorryRaids","RAIDS","BizzareUpdate2!","Sorry4Delays","BOSSTAKEOVER","Sorry4Quest","SorryDelay!!!","SummerEvent!","2xWeekEnd!","Sorry4EvoUnits","Sorry4AutoTraitRoll","!TYBW","!MattLovesARX2","!RaitoLovesARX","!BrandonTheBest"},
 }
 
 local ValidWebhook
@@ -132,7 +132,7 @@ local ValidWebhook
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "LixHub - [🏖️Summer Event] Anime Rangers X",
+   Name = "LixHub - [🩸TYBW] Anime Rangers X",
    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "Loading for Anime Rangers X",
    LoadingSubtitle = "v0.0.3",
@@ -226,7 +226,7 @@ local StatsSection = LobbyTab:CreateSection("🏢 Lobby 🏢")
 local UpdateLogDivider = UpdateLogTab:CreateDivider()
 
 --//LABELS\\--
-local Label1 = UpdateLogTab:CreateLabel("+ Fixed Low Performance Mode, + Added Streamer Mode Toggle (Hides Name/Level/Title), + Fixed Bugs, + Small UI Changes")
+local Label1 = UpdateLogTab:CreateLabel("+ Added delete map, + Fixed Bugs, + Small UI Changes, + Auto boss rush, + Auto Curse Units - Enjoy.")
 local Label2 = UpdateLogTab:CreateLabel("Also please join the discord: https://discord.gg/cYKnXE2Nf8")
 
 --//FUNCTIONS\\--
@@ -257,7 +257,7 @@ end
 
 local function enableDeleteMap()
     if State.enableDeleteMap then
-        local map = Services.Workspace:FindFirstChild("Map")
+        local map = Services.Workspace:FindFirstChild("Building"):FindFirstChild("Map")
 
     if map then map:Destroy() end
 
@@ -391,6 +391,7 @@ local function fetchRangerStageData(storyData)
         ["OPM"] = 5,
         ["TokyoGhoul"] = 6,
         ["JojoPart1"] = 7,
+        ["SoulSociety"] = 8,
     }
 
     local worldDisplayNames = {}
@@ -523,7 +524,7 @@ local function patchRewardsFromFolder(existingGained, detectedRewards, detectedU
             if amount > 0 then
                 detectedRewards[rewardEntry.Name] = amount
                 table.insert(existingGained, { name = rewardEntry.Name, amount = amount, isUnit = false })
-                table.insert(lines, string.format("+ %s %s [via fallback]", amount, rewardEntry.Name))
+                table.insert(lines, string.format("+ %s %s []", amount, rewardEntry.Name))
             end
         end
     end
@@ -1957,7 +1958,7 @@ local Button = LobbyTab:CreateButton({
 })
 
     local Toggle = GameTab:CreateToggle({
-    Name = "Delete Map (Improve Performance)",
+    Name = "Delete Map (Rejoin to disable)",
     CurrentValue = false,
     Flag = "enableDeleteMap",
     Callback = function(Value)
@@ -2141,7 +2142,7 @@ local Toggle = LobbyTab:CreateToggle({
     local rewardNames = {}
 
     for _, reward in ipairs(GameObjects.itemsFolder:GetChildren()) do
-        if reward:IsA("Folder") then
+        if reward:IsA("BoolValue") then
             table.insert(rewardNames, reward.Name)
         end
     end
